@@ -668,6 +668,36 @@ $win.Add_MouseLeftButtonUp({
 # Şehir menüleri kodla üretiliyor: 25 şehir × 2 satır = 50 XAML satırı yerine
 # tek kaynak. Widget klavye odağı almadığı için şehir ADI YAZILAMAZ, listeden
 # seçilir — eşik menüsündeki ile aynı kısıt.
+# TUZAK: Bu gövde bilerek ayrı bir fonksiyonda duruyor.
+#
+# Menü tıklama işleyicisi .GetNewClosure() ile kuruluyor ve closure YENİ BİR
+# MODÜL KAPSAMINA bağlanıyor — orada `$script:` artık betiğin script kapsamı
+# değildir. Closure içinde `$script:Ayar.sehirUst = ...` yazmak `$null`a yazmak
+# demekti ve widget çöküyordu. Aynı sebeple `$script:TzUst` ataması da gerçek
+# betik değişkenine ulaşmıyordu.
+#
+# Closure artık yalnızca yerel değişkenleri ($Alan, $Kok) taşıyıp bu fonksiyonu
+# çağırıyor; `$script:` erişimi normal betik kapsamında kalıyor.
+function Set-SehirSecimi {
+    param([string]$Alan, [string]$Anahtar, $Kok)
+
+    $script:Ayar.$Alan = $Anahtar
+    $script:TzUst = Get-SehirDilimi -Anahtar $script:Ayar.sehirUst
+    $script:TzAlt = Get-SehirDilimi -Anahtar $script:Ayar.sehirAlt
+
+    # Planlama modundayken şehir değişirse çapa saati artık başka bir dilime
+    # ait olur ve anlamı kayar — güvenlisi planı şimdiye almak.
+    if ($script:PlanModu) { Reset-PlanZamani }
+
+    Update-SehirAdlari
+    Update-Saat
+    Save-Ayarlar -Ayar $script:Ayar
+
+    # Menüyü yeniden kurmuyoruz (tıklanan öğe hâlâ olayı işliyor); işaretleri
+    # yerinde güncelliyoruz.
+    foreach ($oge in $Kok.Items) { $oge.IsChecked = ([string]$oge.Tag -eq $Anahtar) }
+}
+
 function Build-SehirMenusu {
     param($Kok, [string]$Alan)
 
@@ -680,18 +710,7 @@ function Build-SehirMenusu {
         $mi.Tag = $s.Anahtar
         $mi.Add_Click({
             param($snd, $e)
-            $script:Ayar.$Alan = [string]$snd.Tag
-            $script:TzUst = Get-SehirDilimi -Anahtar $script:Ayar.sehirUst
-            $script:TzAlt = Get-SehirDilimi -Anahtar $script:Ayar.sehirAlt
-
-            # Planlama modundayken şehir değişirse çapa saati artık başka bir
-            # diliме ait olur ve anlamı kayar — güvenlisi planı şimdiye almak.
-            if ($script:PlanModu) { Reset-PlanZamani }
-
-            Update-SehirAdlari
-            Update-Saat
-            Save-Ayarlar -Ayar $script:Ayar
-            Build-SehirMenusu -Kok $Kok -Alan $Alan
+            Set-SehirSecimi -Alan $Alan -Anahtar ([string]$snd.Tag) -Kok $Kok
         }.GetNewClosure())
         [void]$Kok.Items.Add($mi)
     }
@@ -814,6 +833,18 @@ function Invoke-Tik {
 }
 
 $win.Add_ContentRendered({
+    # Öz-test (SAAT_SEHIRTEST=1): şehir menüsü öğesine GERÇEKTEN tıklar.
+    if ($env:SAAT_SEHIRTEST -eq '1') {
+        try {
+            $hedef = (Get-Ogesi 'MnuSehirUst').Items | Where-Object { [string]$_.Tag -eq 'tokyo' } | Select-Object -First 1
+            Write-Tani ("SEHIRTEST once : sehirUst=$($script:Ayar.sehirUst) hedefVar=$($null -ne $hedef)")
+            $hedef.RaiseEvent((New-Object System.Windows.RoutedEventArgs([System.Windows.Controls.MenuItem]::ClickEvent)))
+            Write-Tani ("SEHIRTEST sonra: sehirUst=$($script:Ayar.sehirUst) ekran=$($AdIst.Text) saat=$($SaatIst.Text)")
+        } catch {
+            Write-Tani ("SEHIRTEST HATA: " + $_.Exception.Message)
+        }
+    }
+
     if ($env:SAAT_OTOTEST -ne '1') { return }
     $win.UpdateLayout()
 
