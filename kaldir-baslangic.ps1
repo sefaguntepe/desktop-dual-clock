@@ -1,14 +1,32 @@
-﻿<#
-    Masaüstü Saat'i Windows açılışından çıkarır.
+<#
+    Masaüstü Saat kısayollarını kaldırır
+    (Başlangıç + Başlat menüsü + varsa masaüstü).
+
+    Çalışan saat kapatılmaz — yalnızca kısayollar silinir.
 #>
 
 $ErrorActionPreference = 'Stop'
 
-$kisayol = Join-Path ([Environment]::GetFolderPath('Startup')) 'Masaustu Saat.lnk'
+$ad = 'Masaustu Saat.lnk'
+$dizinler = @(
+    [Environment]::GetFolderPath('Startup'),
+    [Environment]::GetFolderPath('Programs'),
+    [Environment]::GetFolderPath('Desktop')
+)
 
-if (Test-Path $kisayol) {
-    Remove-Item $kisayol -Force
-    Write-Host "Baslangictan kaldirildi: $kisayol" -ForegroundColor Green
+$silinen = 0
+foreach ($d in $dizinler) {
+    $y = Join-Path $d $ad
+    if (Test-Path $y) {
+        Remove-Item $y -Force
+        Write-Host "Kaldirildi: $y" -ForegroundColor Green
+        $silinen++
+    }
+}
+
+if ($silinen -eq 0) {
+    Write-Host 'Kisayol bulunamadi, yapilacak bir sey kalmadi.' -ForegroundColor Yellow
 } else {
-    Write-Host "Baslangicta kayit yok, yapilacak bir sey kalmadi." -ForegroundColor Yellow
+    Write-Host ''
+    Write-Host 'Not: calisan saat kapatilmadi. Kapatmak icin uzerine sag tik -> Kapat.'
 }

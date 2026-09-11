@@ -47,9 +47,21 @@ cd desktop-dual-clock
 powershell -ExecutionPolicy Bypass -File kur-baslangic.ps1
 ```
 
-`kur-baslangic.ps1` adds a shortcut to your user Startup folder so the clock
-launches at sign-in. It touches nothing else — no registry keys, no system
+`kur-baslangic.ps1` creates **two** shortcuts, both running the same command:
+one in your user Startup folder so the clock launches at sign-in, and one in
+the Start menu so you can reopen it after closing it. Add `-Masaustune` for a
+desktop shortcut too. It touches nothing else — no registry keys, no system
 settings.
+
+**Closed the clock? Type "Masaustu Saat" in Start.**
+
+Both shortcuts go through `conhost.exe` rather than calling `powershell.exe`
+directly: when the default console host is Windows Terminal, `-WindowStyle
+Hidden` does nothing and an empty terminal is left sitting behind the clock.
+The script also hides and frees its own console at startup.
+
+Only one copy runs at a time; launching it again exits quietly. Two copies
+both wrote `ayarlar.json`, so position and city choices overwrote each other.
 
 To run it once without installing:
 

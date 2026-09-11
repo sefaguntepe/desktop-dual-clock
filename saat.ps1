@@ -56,7 +56,35 @@ Add-Type -Namespace Widget -Name Win32 -MemberDefinition @'
 
     [DllImport("user32.dll")]
     public static extern bool SetWindowPos(IntPtr hWnd, IntPtr after, int X, int Y, int cx, int cy, uint flags);
+
+    // Betigi calistiran konsol. Bkz. Hide-Konsol.
+    [DllImport("kernel32.dll")]
+    public static extern IntPtr GetConsoleWindow();
+
+    [DllImport("kernel32.dll")]
+    public static extern bool FreeConsole();
+
 '@
+
+# Arkada duran boş konsol penceresini yok et.
+#
+# Kısayol `-WindowStyle Hidden` ile açıyor ama bu YETMİYOR: kullanıcının
+# varsayılan konsol barındırıcısı Windows Terminal ise pencere sınıfı
+# `CASCADIA_HOSTING_WINDOW_CLASS` oluyor, yani PowerShell'in gizlemeye
+# çalıştığı pencere gerçek sahibi değil — ekranda boş bir terminal açık
+# kalıyor. Aynısı betik çift tıkla çalıştırıldığında da oluyor.
+#
+# İki adım birden: klasik conhost için pencereyi gizle, Windows Terminal için
+# konsolu tamamen bırak. Saat penceresi WPF; konsola hiç ihtiyacı yok.
+function Hide-Konsol {
+    try {
+        $konsol = [Widget.Win32]::GetConsoleWindow()
+        if ($konsol -eq [IntPtr]::Zero) { return }
+        [void][Widget.Win32]::ShowWindow($konsol, 0)   # SW_HIDE
+        [void][Widget.Win32]::FreeConsole()
+    } catch { }
+}
+Hide-Konsol
 
 # Pencereyi z-sırasının dibinde tutmanın DOĞRU yolu.
 #
@@ -115,6 +143,21 @@ $SWP_NOACTIVATE    = 0x0010
 # ─────────────────────────────────────────────────────────────────────────────
 $AyarKlasor = Join-Path $env:APPDATA 'MasaustuSaat'
 $AyarDosya  = Join-Path $AyarKlasor 'ayarlar.json'
+
+# TEK ÖRNEK KORUMASI
+#
+# İki kopya aynı anda çalışırsa ikisi de ayarlar.json'a yazıyor: biri
+# sürüklenince diğeri eski konumu geri yazıyor, şehir seçimleri birbirini
+# eziyor. Üstelik üst üste duran iki saat "kapattım ama duruyor" gibi görünüyor.
+#
+# Kilit adı AYAR KLASÖRÜNDEN türüyor: yalıtılmış APPDATA ile çalışan testler
+# birbirini ve üretimi engellemesin.
+$kilitAdi = 'Local\MasaustuSaat_' + (
+    ([System.Security.Cryptography.MD5]::Create().ComputeHash(
+        [Text.Encoding]::UTF8.GetBytes($AyarKlasor.ToLowerInvariant())
+    ) | ForEach-Object { $_.ToString('x2') }) -join '')
+$script:TekOrnek = New-Object System.Threading.Mutex($false, $kilitAdi)
+if (-not $script:TekOrnek.WaitOne(0)) { exit 0 }   # zaten açık
 
 $ArkaPlanlar = @{
     yok   = '#00000000'

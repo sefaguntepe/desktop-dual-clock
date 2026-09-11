@@ -17,13 +17,24 @@ Kurulum gerektirmez: Windows PowerShell 5.1 + WPF (Windows'ta zaten var).
 | Dosya | Görevi |
 |---|---|
 | `saat.ps1` | Widget'ın kendisi (WPF penceresi + zaman motoru) |
-| `kur-baslangic.ps1` | Windows açılışına ekler (kullanıcı Başlangıç klasörüne kısayol) |
-| `kaldir-baslangic.ps1` | Açılıştan çıkarır |
+| `kur-baslangic.ps1` | Kısayolları kurar (Başlangıç + Başlat menüsü, `-Masaustune` ile masaüstü) |
+| `kaldir-baslangic.ps1` | Kısayolları kaldırır |
 
 ## Kullanım
 
-**Elle başlatmak:** Başlangıç klasöründeki `Masaustu Saat` kısayoluna çift tıkla
-(`Win+R` → `shell:startup`).
+**Elle başlatmak:** Başlat'a **"Masaustu Saat"** yazın. (Saati sağ tık →
+*Kapat* ile kapattıysanız da yolu bu.)
+
+`kur-baslangic.ps1` **iki** kısayol kurar — biri Başlangıç klasöründe açılışta
+çalışsın diye, biri Başlat menüsünde elle açmak için; `-Masaustune` ile
+üçüncüsü masaüstüne. İkisi de `powershell.exe`'yi doğrudan çağırmak yerine
+`conhost.exe` üzerinden gider: varsayılan konsol barındırıcısı Windows Terminal
+olduğunda `-WindowStyle Hidden` işe yaramıyor ve arkada boş bir terminal açık
+kalıyor.
+
+Saat aynı anda **tek kopya** çalışır; ikinci kez açarsanız sessizce çıkar.
+Yoksa iki kopya `ayarlar.json`'a birlikte yazıp konum ve şehir seçimlerini
+birbirine karıştırıyordu.
 
 **Açılışta otomatik başlatmak:**
 
