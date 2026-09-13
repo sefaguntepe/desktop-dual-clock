@@ -1,6 +1,8 @@
-*[English documentation: README.md](README.md)*
+﻿*[English documentation: README.md](README.md)*
 
-# Masaüstü Saat — Los Angeles + İstanbul
+<img src="docs/icon.png" width="88" align="right" alt="Dual Clock ikonu">
+
+# Desktop Dual Clock — iki şehir, tek masaüstü saati
 
 Masaüstünde sürekli duran, şeffaf, dijital çift-saat widget'ı.
 Kurulum gerektirmez: Windows PowerShell 5.1 + WPF (Windows'ta zaten var).
@@ -17,13 +19,19 @@ Kurulum gerektirmez: Windows PowerShell 5.1 + WPF (Windows'ta zaten var).
 | Dosya | Görevi |
 |---|---|
 | `saat.ps1` | Widget'ın kendisi (WPF penceresi + zaman motoru) |
-| `kur-baslangic.ps1` | Kısayolları kurar (Başlangıç + Başlat menüsü, `-Masaustune` ile masaüstü) |
+| `kur-baslangic.ps1` | **Dual Clock** kısayollarını kurar (Başlangıç + Başlat menüsü, `-Masaustune` ile masaüstü) |
+| `dual-clock.ico` | Kısayol ikonu |
 | `kaldir-baslangic.ps1` | Kısayolları kaldırır |
 
 ## Kullanım
 
-**Elle başlatmak:** Başlat'a **"Masaustu Saat"** yazın. (Saati sağ tık →
+**Elle başlatmak:** Başlat'a **"Dual Clock"** yazın. (Saati sağ tık →
 *Kapat* ile kapattıysanız da yolu bu.)
+
+> **Önceki sürümden geliyorsanız:** kısayollar eskiden *Masaustu Saat* adıyla
+> kuruluyordu. Kurulum, kaldırma ve sağ tık → *Windows açılışında başlat*
+> seçeneği eski adlı kısayolu da siliyor; böylece Başlangıç klasöründe saati
+> açan iki kısayol birden kalmıyor.
 
 `kur-baslangic.ps1` **iki** kısayol kurar — biri Başlangıç klasöründe açılışta
 çalışsın diye, biri Başlat menüsünde elle açmak için; `-Masaustune` ile
@@ -31,6 +39,12 @@ Kurulum gerektirmez: Windows PowerShell 5.1 + WPF (Windows'ta zaten var).
 `conhost.exe` üzerinden gider: varsayılan konsol barındırıcısı Windows Terminal
 olduğunda `-WindowStyle Hidden` işe yaramıyor ve arkada boş bir terminal açık
 kalıyor.
+
+Açılışta otomatik başlamayı sonradan widget'ın kendisinden de aç/kapat
+yapabilirsiniz: sağ tık → **Windows açılışında başlat**. Menüdeki tik, ayrı bir
+ayar bayrağından değil **Başlangıç klasöründeki kısayolun gerçekten var olup
+olmadığından** okunuyor; böylece `kur-baslangic.ps1` / `kaldir-baslangic.ps1`'i
+elle çalıştırsanız bile tik gerçeği gösterir.
 
 Saat aynı anda **tek kopya** çalışır; ikinci kez açarsanız sessizce çıkar.
 Yoksa iki kopya `ayarlar.json`'a birlikte yazıp konum ve şehir seçimlerini
@@ -76,7 +90,46 @@ olarak saklanır. Her şehirde Windows saat dilimi kimliği + IANA yedeği var;
 yaz saati geçişleri her şehir için kendi kurallarıyla işler.
 
 > Planlama modundayken şehir değiştirirseniz plan zamanı "şimdi"ye sıfırlanır —
-> çapa saati artık başka bir dilime ait olacağı için anlamı kayardı.
+> ayarlanan saat artık başka bir dilime ait olacağı için anlamı kayardı.
+
+## Görsel Şablonlar (Temalar)
+
+Sağ tık → **Şablon** menüsünden 6 farklı stil arasında geçiş yapabilirsiniz:
+
+- 🌗 **Apple Otomatik (sistemi izler):** Windows'un açık/koyu tema ayarına bakar ve
+  Apple Açık ile Apple Koyu arasında kendiliğinden geçer. Ayarı siz Windows
+  tarafında değiştirdiğiniz anda widget da değişir — yeniden başlatmak gerekmez.
+- 🍏 **Apple Koyu (macOS):** 22px squircle kavisli köşeler, ince parlak frosted cam kenarlık (`#38FFFFFF`), yarı saydam koyu akrilik zemin, yumuşak Apple gölgesi ve canlı sistem renkleri (amber güneş, mavi ay).
+- ⚪ **Apple Açık:** Açık renk duvar kağıtları için buzlu açık cam zemin (`#D9F2F2F7`), ince mat çerçeve ve koyu antrasit tipografi.
+- 🟠 **Kehribar:** Sıcak koyu tema — kahve-siyah zemin (`#D91A1410`), kehribar saat
+  rakamları ve krem tipografi. Ay ikonu bilerek soğuk lavanta: gece/gündüz ayrımı
+  ikon renginden de okunuyor.
+- ⚡ **Neon Akrilik:** OLED derin siyah zemin (`#E608090C`), fütüristik elektrik camgöbeği (cyan) kenarlık ve neon ışıma gölgesi.
+- 🌑 **Klasik Koyu:** Sade, kenarlıksız, minimalist orijinal koyu cam tasarım.
+
+![Şablonlar ve görünümler](docs/themes.png)
+
+*Apple Otomatik* görselde yok çünkü kendine ait bir paleti yok: Windows'un
+açık/koyu ayarını izleyip Apple Koyu ya da Apple Açık olarak çiziliyor.
+
+Seçilen şablon `%APPDATA%\MasaustuSaat\ayarlar.json` içinde `sablon` olarak kalıcı
+saklanır. Otomatik seçildiğinde dosyada `apple-auto` durur — hangi paletin
+kullanılacağı her açılışta (ve her sistem teması değişiminde) yeniden çözülür.
+
+## Görünüm (dijital / analog)
+
+Sağ tık → **Görünüm** ile yerleşim değişir. Bu, şablondan **bağımsız** bir
+ayardır: analog kadran hangi şablon seçiliyse onun renklerini kullanır.
+
+- **Dijital:** İki satır, büyük saat rakamları (varsayılan).
+- **Analog kadran:** İki kadran yan yana; altlarında şehir adı, dijital saat ve
+  tarih. Kadranda 12 çentik (12/3/6/9 daha belirgin), akrep ve yelkovan var —
+  saniye ibresi bilerek yok.
+
+Planlama modunda **üst kadranın ibreleri vurgu rengine geçer** — ayarlanan
+kadran o, alt kadran sonucu gösterir.
+
+Seçim `ayarlar.json` içinde `gorunum` olarak (`dijital` / `analog`) saklanır.
 
 ## Planlama modu
 
@@ -86,24 +139,25 @@ karşılığı anında görünür.
 **Açmak:** sağ tık → *Planlama modu*
 
 ```
-🌙 İSTANBUL       13:00   ← çapa (amber)
+🌙 İSTANBUL       13:00   ← ayarladığınız satır (vurgulu)
    20 Ağu Per
-☀ LOS ANGELES     03:00
+☀ LOS ANGELES     03:00   ← sonuç
    20 Ağu Per
 ┌ PLANLAMA                    fark 10 sa
-│ [−] [+] [şimdi] [çapa: İST] [✕]
-└ tekerlek 15dk · Shift 1sa · Ctrl 1gün
+│ [−] [+] [şimdi] [✕]
+└ tekerlek 15dk · Shift 1sa
 ```
 
 | Kontrol | Ne yapar |
 |---|---|
 | `−` / `+` | 15 dakika geri / ileri |
-| Fare tekerleği | 15 dk — **Shift** ile 1 saat, **Ctrl** ile 1 gün |
+| Fare tekerleği | 15 dk — **Shift** ile 1 saat |
 | `şimdi` | Şu anı alır, sonraki 15 dakikaya yuvarlar |
-| `çapa: İST` | Tarafı değiştirir; **an korunur** (İST 13:00 → LA çapasında 03:00) |
 | `✕` | Canlı saate döner |
 
-Çapa şehrin saati amber yanar. Her iki şehrin tarihi ayrı gösterildiği için
+**Ayarladığınız satır her zaman üsttekidir** ve vurgulu yanar; alttaki sonucu
+gösterir. Diğer şehrin saatine göre planlamak isterseniz *Şehir seç* ile iki
+satırın şehrini yer değiştirin. Her iki şehrin tarihi ayrı gösterildiği için
 gün kayması (LA'da bir önceki gün) doğrudan okunur.
 
 > **Mod kalıcı değildir** — her başlangıçta canlı saatten başlar. Açılışta
@@ -120,8 +174,16 @@ tüm kontroller fare tabanlı.
 ## Etkileşim
 
 - **Sürükle:** sol tuşla tut ve taşı; bırakınca konum kaydedilir.
-- **Sağ tık:** arka plan yoğunluğu (yok / hafif / koyu), konumu sıfırla,
-  masaüstü seviyesine yeniden yerleştir, kapat.
+- **Sağ tık:**
+  - **Şablon:** Apple Otomatik (sistemi izler), Apple Koyu (macOS), Apple Açık,
+    Kehribar, Neon Akrilik, Klasik Koyu
+  - **Görünüm:** Dijital / Analog kadran
+  - **Arka plan:** Yok (tam şeffaf) / Hafif / Koyu
+  - **Planlama modu:** Saat dönüştürücü şeridini açar/kapatır
+  - **Şehir seç:** Üst ve alt satır için 25 şehir
+  - **Windows açılışında başlat:** Başlangıç klasöründeki kısayolu açar/kapatır
+  - **Konumu sıfırla:** Sağ üst köşeye döndürür
+  - **Kapat:** Uygulamadan çıkar
 
 Ayarlar: `%APPDATA%\MasaustuSaat\ayarlar.json`
 
@@ -133,6 +195,36 @@ arasında değişirken Türkiye 2016'dan beri kalıcı UTC+3'te. Sabit ofset yaz
 yılda ~3 hafta boyunca saat yanlış gösterirdi. DST geçişlerinde iki şehir arası
 fark 10 ↔ 11 saat arasında kendiliğinden değişir.
 
+**Plan zamanı bir AN olarak tutuluyor (UTC), bir şehrin duvar saati olarak
+değil.** Kulağa ayrıntı gibi geliyor ama planlama modunun doğruluğu buna
+bağlı: duvar saati ile an arasında birebir eşleme yoktur — ileri alma
+gecesinde bir saat hiç yaşanmaz, geri alma gecesinde bir saat iki kez yaşanır.
+Önceki sürüm üst şehrin duvar saatini adımlıyordu ve geçiş saatinde `+15 dk`
+basmak karşı şehrin saatini **45 dakika geri** götürebiliyordu; fark da o bir
+saat boyunca bir saat yanlış okunuyordu. An'ı UTC olarak adımlayınca iki satır
+da tam olarak adım kadar ilerliyor.
+
+Görünen sonuç şaşırtıcı değil, doğru: üstte Londra varken ileri alma gecesinde
+adımlarsanız 00:45 → 02:00 okursunuz, çünkü o gece 01:00 gerçekten yoktur.
+Geri alma gecesinde alttaki şehir tekrar eden saati iki kez gösterir —
+o şehrin saatleri gerçekten böyle yapar — ve fark tam doğru anda değişir.
+
+**Görünüm, şablondan ayrı bir eksen.** Şablon renk paletini, görünüm
+yerleşimi belirliyor — analog kadran hangi şablon seçiliyse onun renklerini
+kullanıyor. Bunları tek listede birleştirmek ("Kehribar Analog" gibi bir
+şablon) altı şablon × iki yerleşim = on iki giriş demekti; her renk
+değişikliğini iki yerde yapmak gerekirdi.
+
+Kadranın çentikleri ve ibreleri XAML'de değil kodda üretiliyor (`New-Kadran`):
+12 çentik × 2 kadran elle yazılacak 24 satır eder, ve ibrelerin dönüş merkezi
+zaten kadran boyutundan hesaplanıyor. İbreler 12 yönünde çizilip
+`RotateTransform` ile döndürülüyor; güncellemede tek bir `Angle` ataması
+yetiyor, geometri yeniden hesaplanmıyor.
+
+**Saniye ibresi yok.** Kadran dakikada bir güncelleniyor; masaüstünde sürekli
+duran bir widget için saniyede bir yeniden çizim boşa giden iş. `Update-Saat`
+aynı dakika içinde çağrıldığında hemen çıkıyor.
+
 **Masaüstü seviyesi.** Klasik yöntem pencereyi `SetParent` ile Progman'ın
 (masaüstü penceresi) çocuğu yapmaktır. WPF'te bu iki sorun çıkardı: koordinatlar
 ebeveyne göreli hâle gelip çok monitörlü kurulumda pencere ekran dışına kaçtı
@@ -142,10 +234,12 @@ Bunun yerine pencere normal üst düzey pencere olarak kalıyor ama:
 
 - `WS_EX_NOACTIVATE` → tıklanınca öne gelmez, odağı çalmaz
 - `WS_EX_TOOLWINDOW` → Alt+Tab ve görev çubuğunda görünmez
-- `HWND_BOTTOM` → 2 saniyede bir z-sırasının dibine gönderilir
+- `HWND_BOTTOM` → `WM_WINDOWPOSCHANGING` kancası ile z-sırasının dibinde tutulur
 
 Sonuç kullanıcı açısından aynı: masaüstünde durur, hiçbir pencerenin önünü
-kesmez. Win+D ile küçültülürse aynı döngü geri getirir.
+kesmez. Win+D sonrası küçültülürse `StateChanged` olayıyla hemen geri açılır.
+Periyodik yoklama yapılmadığı için masaüstü sağ tık menüsünü kapatmaz veya
+simge seçimini bozmaz.
 
 **Tuzaklar** (aynı hataya düşmemek için):
 

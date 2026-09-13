@@ -1,4 +1,4 @@
-<#
+﻿<#
     Masaüstü Saat kısayollarını kaldırır
     (Başlangıç + Başlat menüsü + varsa masaüstü).
 
@@ -7,7 +7,9 @@
 
 $ErrorActionPreference = 'Stop'
 
-$ad = 'Masaustu Saat.lnk'
+# Yeni ad + eski adlar birlikte temizleniyor; yoksa yukseltme oncesi kurulmus
+# bir kisayol Baslangic klasorunde kalip acilista calismaya devam ederdi.
+$adlar = @('Dual Clock.lnk', 'Masaustu Saat.lnk')
 $dizinler = @(
     [Environment]::GetFolderPath('Startup'),
     [Environment]::GetFolderPath('Programs'),
@@ -16,11 +18,13 @@ $dizinler = @(
 
 $silinen = 0
 foreach ($d in $dizinler) {
-    $y = Join-Path $d $ad
-    if (Test-Path $y) {
-        Remove-Item $y -Force
-        Write-Host "Kaldirildi: $y" -ForegroundColor Green
-        $silinen++
+    foreach ($ad in $adlar) {
+        $y = Join-Path $d $ad
+        if (Test-Path $y) {
+            Remove-Item $y -Force
+            Write-Host "Kaldirildi: $y" -ForegroundColor Green
+            $silinen++
+        }
     }
 }
 
