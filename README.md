@@ -1,4 +1,4 @@
-﻿<img src="docs/icon.png" width="88" align="right" alt="Dual Clock icon">
+<img src="docs/icon.png" width="88" align="right" alt="Dual Clock icon">
 
 # Desktop Dual Clock
 
@@ -34,6 +34,8 @@ shift, which is where most mistakes happen.
   setting automatically — right-click → *Theme / Style*
 - **Digital or analog** — right-click → *View*. The analog dials take their
   colours from whichever theme is active, so the two settings compose
+- **Start with Windows** — toggle auto-start from the right-click menu, no
+  installer and no registry keys
 - **Desktop-level** — never steals focus, never covers your work, stays below
   every window
 - **Drag anywhere**, adjustable background opacity, position remembered

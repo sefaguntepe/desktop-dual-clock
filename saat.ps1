@@ -1473,6 +1473,35 @@ try {
     Write-Tani ("sistem temasi izleyici kurulamadi: " + $_.Exception.Message)
 }
 
+# Ekran düzeni izleyici.
+#
+# Kayıtlı konum yalnızca AÇILIŞTA doğrulanıyordu. Dizüstü dock'tan çıkarılınca
+# ya da projektör sökülünce pencere görünen alanın dışında kalabiliyor — ve
+# oradan KURTARMANIN YOLU YOK: görev çubuğunda görünmüyor, Alt+Tab'de yok, sağ
+# tık menüsüne ulaşmak için üzerine tıklamak gerekiyor, tek-örnek kilidi
+# yüzünden yeniden açmak da işe yaramıyor. Geriye ayarlar.json'ı elle silmek
+# kalıyordu. Ekran düzeni her değiştiğinde konumu yeniden doğruluyoruz.
+$script:EkranIzleyici = $null
+try {
+    $script:EkranIzleyici = [System.EventHandler]{
+        param($gonderen, $olay)
+        $win.Dispatcher.BeginInvoke([Action]{
+            if (-not (Test-PencereEkrandaMi -Sol $script:KonumSol -Ust $script:KonumUst)) {
+                Write-Tani ("ekran duzeni degisti; pencere disarida ({0},{1}) -> sifirlaniyor" -f `
+                            $script:KonumSol, $script:KonumUst)
+                Set-VarsayilanKonum
+                $script:Ayar.sol = $script:KonumSol
+                $script:Ayar.ust = $script:KonumUst
+                Save-Ayarlar -Ayar $script:Ayar
+            }
+        }) | Out-Null
+    }
+    [Microsoft.Win32.SystemEvents]::add_DisplaySettingsChanged($script:EkranIzleyici)
+} catch {
+    $script:EkranIzleyici = $null
+    Write-Tani ('ekran izleyici kurulamadi: ' + $_.Exception.Message)
+}
+
 # Win+D ("masaüstünü göster") pencereyi küçültür. Yoklama yerine olayı
 # dinliyoruz — küçültüldüğü anda geri aç.
 $win.Add_StateChanged({
@@ -1574,6 +1603,9 @@ $win.Add_Closed({
     # hem de kendi iş parçacığı üzerinden ölü pencereye çağrı riski var.
     if ($null -ne $script:SistemTemaIzleyici) {
         try { [Microsoft.Win32.SystemEvents]::remove_UserPreferenceChanged($script:SistemTemaIzleyici) } catch { }
+    }
+    if ($null -ne $script:EkranIzleyici) {
+        try { [Microsoft.Win32.SystemEvents]::remove_DisplaySettingsChanged($script:EkranIzleyici) } catch { }
     }
     try {
         $script:TekOrnek.ReleaseMutex()

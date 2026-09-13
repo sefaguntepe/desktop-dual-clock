@@ -1,4 +1,4 @@
-﻿*[English documentation: README.md](README.md)*
+*[English documentation: README.md](README.md)*
 
 <img src="docs/icon.png" width="88" align="right" alt="Dual Clock ikonu">
 
@@ -7,12 +7,7 @@
 Masaüstünde sürekli duran, şeffaf, dijital çift-saat widget'ı.
 Kurulum gerektirmez: Windows PowerShell 5.1 + WPF (Windows'ta zaten var).
 
-```
-☀  İSTANBUL       07:06
-   12 Ağu Çar
-🌙 LOS ANGELES    21:06
-   11 Ağu Sal
-```
+![Masaüstünde widget](docs/clock.tr.png)
 
 ## Dosyalar
 
@@ -107,7 +102,7 @@ Sağ tık → **Şablon** menüsünden 6 farklı stil arasında geçiş yapabili
 - ⚡ **Neon Akrilik:** OLED derin siyah zemin (`#E608090C`), fütüristik elektrik camgöbeği (cyan) kenarlık ve neon ışıma gölgesi.
 - 🌑 **Klasik Koyu:** Sade, kenarlıksız, minimalist orijinal koyu cam tasarım.
 
-![Şablonlar ve görünümler](docs/themes.png)
+![Şablonlar ve görünümler](docs/themes.tr.png)
 
 *Apple Otomatik* görselde yok çünkü kendine ait bir paleti yok: Windows'un
 açık/koyu ayarını izleyip Apple Koyu ya da Apple Açık olarak çiziliyor.
@@ -154,6 +149,8 @@ karşılığı anında görünür.
 | Fare tekerleği | 15 dk — **Shift** ile 1 saat |
 | `şimdi` | Şu anı alır, sonraki 15 dakikaya yuvarlar |
 | `✕` | Canlı saate döner |
+
+![Planlama modu](docs/planning.tr.png)
 
 **Ayarladığınız satır her zaman üsttekidir** ve vurgulu yanar; alttaki sonucu
 gösterir. Diğer şehrin saatine göre planlamak isterseniz *Şehir seç* ile iki
