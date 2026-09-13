@@ -1,3 +1,5 @@
+﻿<img src="docs/icon.png" width="88" align="right" alt="Dual Clock icon">
+
 # Desktop Dual Clock
 
 A transparent, always-on-desktop clock for Windows that shows **two cities side by
@@ -23,16 +25,30 @@ shift, which is where most mistakes happen.
 
 - **Two cities, 25 to choose from** — right-click → *Select city*
 - **Planning mode** — pick a time in one city, see the other instantly
-  (`−`/`+` 15 min, mouse wheel, Shift = 1 hour, Ctrl = 1 day)
+  (`−`/`+` 15 min, mouse wheel, Shift = 1 hour)
 - **Correct DST handling** — no fixed offsets; conversions use each city's own
   rules for the date in question, so the gap changes by itself across
   transitions
 - **Day/night icon** per city and separate dates, so a next-day shift is obvious
+- **Six visual themes**, including one that follows the Windows light/dark
+  setting automatically — right-click → *Theme / Style*
+- **Digital or analog** — right-click → *View*. The analog dials take their
+  colours from whichever theme is active, so the two settings compose
 - **Desktop-level** — never steals focus, never covers your work, stays below
   every window
 - **Drag anywhere**, adjustable background opacity, position remembered
 
 ![Planning mode](docs/planning.png)
+
+## Themes and views
+
+Every theme works in both views — *Theme / Style* sets the palette,
+*View* sets the layout, and the two compose freely.
+
+![Themes and views](docs/themes.png)
+
+*Apple Auto* is not pictured because it has no palette of its own: it follows
+the Windows light/dark setting and renders as Apple Dark or Apple Light.
 
 ## Requirements
 
@@ -47,13 +63,23 @@ cd desktop-dual-clock
 powershell -ExecutionPolicy Bypass -File kur-baslangic.ps1
 ```
 
-`kur-baslangic.ps1` creates **two** shortcuts, both running the same command:
-one in your user Startup folder so the clock launches at sign-in, and one in
-the Start menu so you can reopen it after closing it. Add `-Masaustune` for a
-desktop shortcut too. It touches nothing else — no registry keys, no system
+`kur-baslangic.ps1` creates **two** shortcuts named **Dual Clock**, both running
+the same command: one in your user Startup folder so the clock launches at
+sign-in, and one in the Start menu so you can reopen it after closing it. Add
+`-Masaustune` for a desktop shortcut too. They carry the app icon
+(`dual-clock.ico`). It touches nothing else — no registry keys, no system
 settings.
 
-**Closed the clock? Type "Masaustu Saat" in Start.**
+Upgrading from an earlier version? The shortcuts used to be called *Masaustu
+Saat*. Installing, uninstalling, or toggling *Start with Windows* removes the
+old ones, so you never end up with two shortcuts both launching the clock.
+
+**Closed the clock? Type "Dual Clock" in Start.**
+
+You can also turn auto-start on or off later from the widget itself:
+right-click -> *Start with Windows*. The tick reflects whether the Startup
+shortcut actually exists, so it stays honest even if you run
+`kur-baslangic.ps1` / `kaldir-baslangic.ps1` by hand.
 
 Both shortcuts go through `conhost.exe` rather than calling `powershell.exe`
 directly: when the default console host is Windows Terminal, `-WindowStyle
@@ -75,21 +101,24 @@ Right-click the widget:
 
 | Menu | What it does |
 |---|---|
+| *Theme / Style* | Apple Auto (follows the Windows light/dark setting), Apple Dark, Apple Light, Amber Dusk, Neon Acrylic, Classic Dark |
+| *View* | Digital rows, or two analog dials side by side |
 | *Background* | Transparent / light / dark backdrop |
 | *Select city* | Choose the city for the top and bottom row |
 | *Planning mode* | Toggle the time converter |
+| *Start with Windows* | Toggle the Startup-folder shortcut on or off |
 | *Reset position* | Move back to the top-right corner |
 | *Close* | Quit |
 
-**Planning mode.** One row is the *anchor* (highlighted amber). Change its time
-and the other row follows.
+**Planning mode.** The **top row is the one you set** (highlighted). Change its
+time and the bottom row follows. To plan in the other city's time instead, swap
+the two cities from *Select city*.
 
 | Control | Action |
 |---|---|
 | `−` / `+` | ∓15 minutes |
-| Mouse wheel | 15 min — **Shift** 1 hour, **Ctrl** 1 day |
+| Mouse wheel | 15 min — **Shift** 1 hour |
 | `now` | Now, rounded up to the next 15 minutes |
-| `anchor: …` | Swap which city is the anchor (the instant is preserved) |
 | `✕` | Back to the live clock |
 
 Planning mode is deliberately **not** persisted — it always starts as a live
@@ -107,10 +136,24 @@ timer instead, which quietly broke the desktop — the right-click menu closed
 itself and icon rubber-band selection kept getting cancelled. Watching the
 event is correct; polling is not.
 
-**Time conversion.** Never a fixed offset. Every conversion goes
-local → UTC → target using `TimeZoneInfo`, so each city's DST rules apply for
-the date being converted. Times that do not exist (the hour skipped when clocks
-jump forward) are shifted an hour ahead instead of throwing.
+**Time conversion.** Never a fixed offset. Both rows are rendered from one
+UTC instant through `TimeZoneInfo`, so each city's own DST rules apply for the
+date in question.
+
+Planning mode stores that instant **as UTC**, not as a city's wall clock —
+which matters more than it sounds. Wall clock and instant are not a one-to-one
+mapping: on the spring-forward night one hour never happens, and on the
+fall-back night one hour happens twice. An earlier version stepped the top
+city's wall clock, so pressing `+15 min` across a transition could send the
+other city's clock *backwards* by 45 minutes, and the "hours apart" readout was
+off by one for that hour. Stepping a UTC instant makes both rows advance by
+exactly the step, always.
+
+The visible consequence is correct rather than surprising: step across the
+spring-forward hour with London on top and it reads 00:45 → 02:00, because
+01:00 genuinely does not exist that night. On the fall-back night the other
+city shows its repeated hour twice — which is what its clocks actually do —
+and the difference readout flips at the right moment.
 
 **Configuration** lives in `%APPDATA%\MasaustuSaat\ayarlar.json`.
 
